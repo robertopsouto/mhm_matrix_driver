@@ -103,7 +103,7 @@ int main(int argc, char *argv[])
     mm_write_banner(fh, matcode);
     mm_write_mtx_crd_size(fh, Mh, Nh+N2, nzh+nz2);
     for (i=0; i<nz2; i++)
-        fprintf(f1, "%d %d %lg\n", I[i], J[i], -val[i]);
+        fprintf(f1, "%d %d %lg\n", J[i], I[i], -val[i]);
         //fprintf(f1, "%d %d %12.6e\n", I[i], J[i], val[i]);
         //fprintf(f1, "%d %d %10.6g\n", I[i], J[i], val[i]);
 

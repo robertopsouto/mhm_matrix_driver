@@ -88,7 +88,7 @@ int main(int argc, char *argv[])
     for (i=0; i<nz2; i++)
     {
         fscanf(f2, "%d %d %lg\n", &I[i], &J[i], &val[i]);
-        J[i]= J[i] + Nh;
+        I[i]= I[i] + Mh;
     }
 
     if (f2 !=stdin) fclose(f2);
@@ -101,9 +101,9 @@ int main(int argc, char *argv[])
     if ((fh = fopen("header.txt", "w")) == NULL) 
             exit(1);
     mm_write_banner(fh, matcode);
-    mm_write_mtx_crd_size(fh, Mh, Nh+N2, nzh+nz2);
+    mm_write_mtx_crd_size(fh, Mh+M2, Nh, nzh+nz2);
     for (i=0; i<nz2; i++)
-        fprintf(f1, "%d %d %lg\n", I[i], J[i], -val[i]);
+        fprintf(f1, "%d %d %lg\n", I[i], J[i], val[i]);
         //fprintf(f1, "%d %d %12.6e\n", I[i], J[i], val[i]);
         //fprintf(f1, "%d %d %10.6g\n", I[i], J[i], val[i]);
 
