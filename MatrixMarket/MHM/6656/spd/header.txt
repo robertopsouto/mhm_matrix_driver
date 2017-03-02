@@ -1,0 +1,2 @@
+%%MatrixMarket matrix coordinate real symmetric
+6656 6656 1002752
