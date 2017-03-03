@@ -1,6 +1,0 @@
-./MatrixMarket_MHM_subproblem.txt0
-./MatrixMarket_MHM_subproblem.txt1
-./MatrixMarket_MHM_subproblem.txt2
-./MatrixMarket_MHM_subproblem.txt3
-./MatrixMarket_MHM_subproblem.txt4
-./MatrixMarket_MHM_subproblem.txt5
