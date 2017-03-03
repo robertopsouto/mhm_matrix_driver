@@ -49,26 +49,34 @@ int main(int argc, char *argv[])
 {
     /* Matrix Market reading */
     int ret_code;
-    MM_typecode matcode;
-    FILE *f, *fo;
+    MM_typecode matcode, rhs_matcode;
+    FILE *f, *frhs, *fo;
     MKL_INT m, n, nnz, nnzmax;
     MKL_INT i, *rowind, *colind;
     double *acoo;
 
-    if (argc < 2)
+    if (argc < 3)
         {
-                fprintf(stderr, "Usage: %s [martix-market-filename]\n", argv[0]);
+                fprintf(stderr, "Usage: %s [matrix-market-filename (.mtx)] [rhs-matrix-market-filename (.mtx)]\n", argv[0]);
                 exit(1);
         }
     else
     {
         if ((f = fopen(argv[1], "r")) == NULL)
-            exit(1);
+            exit(1); 
+        if ((frhs = fopen(argv[2], "r")) == NULL)
+            exit(1); 
     }
 
     if (mm_read_banner(f, &matcode) != 0)
     {
         printf("Could not process Matrix Market banner.\n");
+        exit(1);
+    }
+
+    if (mm_read_banner(frhs, &rhs_matcode) != 0)
+    {
+        printf("Could not process RHS Matrix Market banner.\n");
         exit(1);
     }
 
@@ -211,9 +219,9 @@ int main(int argc, char *argv[])
     iparm[1] = 2;         /* Fill-in reordering from METIS */
 
 //    iparm[0] = 1;         /* No solver default */
-//    iparm[1] = 0;         /* Fill-in reordering from METIS */
+//    iparm[1] = 2;         /* Fill-in reordering from METIS */
 //    iparm[3] = 0;         /* No iterative-direct algorithm */
-//    iparm[4] = 0;         /* No user fill-in reducing permutation */
+//   iparm[4] = 0;         /* No user fill-in reducing permutation */
 //    iparm[5] = 0;         /* Write solution into x */
 //    iparm[6] = 0;         /* Not in use */
 //    iparm[7] = 2;         /* Max numbers of iterative refinement steps */
@@ -261,7 +269,7 @@ int main(int argc, char *argv[])
 /* -------------------------------------------------------------------- */
 /* .. Numerical factorization. */
 /* -------------------------------------------------------------------- */
-    phase = 22;
+/*    phase = 22;
     PARDISO (pt, &maxfct, &mnum, &mtype, &phase,
              &n, acsr, ia, ja, &idum, &nrhs, iparm, &msglvl, &ddum, &ddum, &error);
     if ( error != 0 )
@@ -269,17 +277,26 @@ int main(int argc, char *argv[])
         printf ("\nERROR during numerical factorization: %d", error);
         exit (2);
     }
-    printf ("\nFactorization completed ... ");
+    printf ("\nFactorization completed ... "); */
 /* -------------------------------------------------------------------- */
-/* .. Back substitution and iterative refinement. */
+/* .. Numerical factorization, back substitution and iterative refinement. */
 /* -------------------------------------------------------------------- */
-    phase = 33;
+    phase = 23;
     iparm[7] = 2;         /* Max numbers of iterative refinement steps. */
     /* Set right hand side to one. */
-    for ( i = 0; i < n; i++ )
+    /*for ( i = 0; i < n; i++ )
     {
         b[i] = 1;
+    }*/
+    /* Set right hand side. */
+    /* reading the second line of header from mtx file */
+    fscanf(frhs, "%d %d %lg\n", &rowind[0], &colind[0], &b[0]);
+    /* reading the values of rhs from mtx file */
+    for ( i = 0; i < n; i++ )
+    {
+        fscanf(frhs, "%d %d %lg\n", &rowind[i], &colind[i], &b[i]);
     }
+
     PARDISO (pt, &maxfct, &mnum, &mtype, &phase,
              &n, acsr, ia, ja, &idum, &nrhs, iparm, &msglvl, b, x, &error);
     if ( error != 0 )
