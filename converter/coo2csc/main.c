@@ -37,15 +37,14 @@ int main(int argc, char *argv[])
     filename = argv[1];
     printf("filename: %s \n",filename);
     struct coo_matrix_t* A = bebop_malloc (sizeof (struct coo_matrix_t));
-    printf("read code: %d \n",code);
-    code = read_matrix_market_real_sparse ("MatrixMarket_MHM_subproblem.mtx", A);
     //code = read_matrix_market_real_sparse (filename, A);
-    printf("read code: %d \n",code);
-    if ( code != 0 )
+    code = read_matrix_market_sparse (filename, A);
+    if (code != 0)
        {
              fprintf(stderr, "Could not open Matrix Market file");
-              exit(1);
+             exit(1);
        }
+    printf("read code: %d \n",code);
 
     return 0;
 }
