@@ -114,7 +114,7 @@ solve(const struct csc_matrix_t* A)
    akeep = NULL; fkeep = NULL; /* Important that these are NULL to start with */
    spral_ssids_default_options(&options);
 
-   bool posdef = true;
+   bool posdef = false;
 
    /* Data for matrix:
     * ( 2  1         )
@@ -152,7 +152,7 @@ solve(const struct csc_matrix_t* A)
         x[i] = 1;
         ptr[i]=A->colptr[i]+1;
     }
-    ptr[n] = nnz;
+    ptr[n] = nnz+1;
 
     //const double* const values = (const double* const) (A->values);
     double* val = (double*) (A->values);
