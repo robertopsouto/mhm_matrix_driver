@@ -19,7 +19,6 @@
 #include <string.h>
 #include <unistd.h>
 
-
 int
 matrix_properties(const struct csc_matrix_t* A);
 
@@ -115,7 +114,16 @@ solve(const struct csc_matrix_t* A)
    akeep = NULL; fkeep = NULL; /* Important that these are NULL to start with */
    spral_ssids_default_options(&options);
 
-   bool posdef = true;
+   bool use_gpu=options.use_gpu;
+   long min_gpu_work=options.min_gpu_work;
+   float gpu_perf_coeff=options.gpu_perf_coeff;
+
+   printf("use_gpu: %d, min_gpu_work: %li, gpu_perf_coeff: %f \n ",use_gpu,min_gpu_work,gpu_perf_coeff);
+
+   options.min_gpu_work=1;
+   options.gpu_perf_coeff=10.0;
+
+   bool posdef = false;
 
    /* Data for matrix:
     * ( 2  1         )
@@ -175,6 +183,8 @@ solve(const struct csc_matrix_t* A)
          &inform);
    seconds = get_seconds() - seconds;
    printf ("done, in %g seconds\n", seconds);
+   printf("min_gpu_work: %li, gpu_perf_coeff: %f \n ",options.min_gpu_work,options.gpu_perf_coeff);
+   //printf("cpu_flops: %li, gpu_flops: %li \n ",inform->cpu_flops,inform->gpu_flops);
 
    if(inform.flag<0) {
       spral_ssids_free(&akeep, &fkeep);
@@ -215,9 +225,8 @@ solve(const struct csc_matrix_t* A)
 
    /* Determine and print the pivot order */
    int piv_order[n];
-   //spral_ssids_enquire_indef(akeep, fkeep, &options, &inform, piv_order, NULL);
-   //spral_ssids_enquire_posdef(akeep, fkeep, &options, &inform, d);
-   //printf("Pivot order:");
+   spral_ssids_enquire_indef(akeep, fkeep, &options, &inform, piv_order, NULL);
+   printf("Pivot order:");
    //for(int i=0; i<n; i++) printf(" %5d", piv_order[i]);
    printf("\n");
 

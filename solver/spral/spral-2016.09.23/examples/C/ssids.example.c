@@ -19,7 +19,6 @@
 #include <string.h>
 #include <unistd.h>
 
-
 int
 matrix_properties(const struct csc_matrix_t* A);
 
@@ -115,7 +114,7 @@ solve(const struct csc_matrix_t* A)
    akeep = NULL; fkeep = NULL; /* Important that these are NULL to start with */
    spral_ssids_default_options(&options);
 
-   bool posdef = true;
+   bool posdef = false;
 
    /* Data for matrix:
     * ( 2  1         )
@@ -147,10 +146,15 @@ solve(const struct csc_matrix_t* A)
     /* RHS and solution vectors. */
     double *x;
     x = (double *) malloc(n * sizeof(double));
+    /* The right-hand side with solution (1.0, 2.0, 3.0, 4.0, 5.0) */
+    //double rhs[] = { 4.0, 17.0, 19.0, 2.0, 12.0 };
+    double rhs[] = { 1.0, 1.0, 1.0, 1.0, 1.0 };
+
 
     for ( i = 0; i < n; i++ )
     {
-        x[i] = 1;
+        //x[i] = 1;
+        x[i] = rhs[i];
         ptr[i]=A->colptr[i]+1;
     }
     ptr[n] = nnz+1;
@@ -162,7 +166,12 @@ solve(const struct csc_matrix_t* A)
         row[i] = A->rowidx[i]+1;
     }
    
-   
+  for(i=0; i<=n; i++) printf(" %li", ptr[i]);
+   printf("\n");
+  for(i=0; i<nnz; i++) printf(" %d", row[i]);
+   printf("\n");
+  for(i=0; i<nnz; i++) printf(" %18.1e", val[i]);
+   printf("\n");
 
    /* Perform analyse and factorise with data checking */
    bool check = true;
@@ -209,16 +218,16 @@ solve(const struct csc_matrix_t* A)
 
    printf("The computed solution is:\n");
    for(int i=0; i<n; i++) fprintf(ofp," %18.10e \n", x[i]);
+   for(int i=0; i<n; i++) printf(" %18.10e", x[i]);
    printf("\n");
 
    fclose(ofp);
 
    /* Determine and print the pivot order */
    int piv_order[n];
-   //spral_ssids_enquire_indef(akeep, fkeep, &options, &inform, piv_order, NULL);
-   //spral_ssids_enquire_posdef(akeep, fkeep, &options, &inform, d);
-   //printf("Pivot order:");
-   //for(int i=0; i<n; i++) printf(" %5d", piv_order[i]);
+   spral_ssids_enquire_indef(akeep, fkeep, &options, &inform, piv_order, NULL);
+   printf("Pivot order:");
+   for(int i=0; i<n; i++) printf(" %5d", piv_order[i]);
    printf("\n");
 
    int cuda_error = spral_ssids_free(&akeep, &fkeep);
